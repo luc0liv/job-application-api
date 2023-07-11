@@ -4,14 +4,16 @@ import com.ibmbootcamp.jobapplicationapi.Entity.Candidato;
 import com.ibmbootcamp.jobapplicationapi.dtos.CandidatoPayloadDTO;
 import com.ibmbootcamp.jobapplicationapi.dtos.CandidatoResponseDTO;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import org.springframework.stereotype.Service;
 
 @Service
 public class CandidatoService {
   public List<Candidato> candidatos = new ArrayList<>();
-  private static final List<String> aprovados = new ArrayList<>();
+  private static List<String> aprovados = new ArrayList<>();
   private int newId = 1;
 
   public CandidatoResponseDTO iniciarProcesso(CandidatoPayloadDTO candidatoDTO) {
@@ -53,7 +55,7 @@ public class CandidatoService {
   public void desqualificarCandidato(CandidatoPayloadDTO candidato) {
     boolean encontrado = false;
     for (int i = 0; i < candidatos.size(); i++) {
-      if (Objects.equals(candidatos.get(i).getCodCandidato(), candidato.codCandidato())
+      if (candidatos.get(i).getCodCandidato() == candidato.codCandidato()
       && candidatos.get(i).getStatus().equals("Qualificado")) {
         candidatos.remove(i);
         encontrado = true;
@@ -69,7 +71,7 @@ public class CandidatoService {
   public void aprovarCandidato(CandidatoPayloadDTO candidato) {
     boolean encontrado = false;
     for (Candidato cand : candidatos) {
-      if (Objects.equals(cand.getCodCandidato(), candidato.codCandidato()) && cand.getStatus().equals("Qualificado")) {
+      if (cand.getCodCandidato() == candidato.codCandidato() && cand.getStatus().equals("Qualificado")) {
           cand.setStatus("Aprovado");
           encontrado = true;
           break;
@@ -86,7 +88,7 @@ public class CandidatoService {
     boolean encontrado = false;
     String statusDoCandidato = "";
     for (Candidato cand : candidatos) {
-      if (Objects.equals(cand.getCodCandidato(), codCandidato)) {
+      if (cand.getCodCandidato() == codCandidato) {
         statusDoCandidato = cand.getStatus();
         encontrado = true;
       }
@@ -98,12 +100,15 @@ public class CandidatoService {
   }
 
   public List<String> obterAprovados() {
+    Set<String> nomesAprovados = new HashSet<>();
+
     for (Candidato candidato : candidatos) {
-      if (Objects.equals(candidato.getStatus(), "Aprovado")) {
-        aprovados.add(candidato.getNome());
+      if (candidato.getStatus().equals("Aprovado")) {
+        nomesAprovados.add(candidato.getNome());
       }
     }
 
+    aprovados = (List<String>) nomesAprovados;
     return aprovados;
   }
 }
