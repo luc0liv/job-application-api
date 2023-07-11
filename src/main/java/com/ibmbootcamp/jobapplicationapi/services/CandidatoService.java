@@ -1,6 +1,7 @@
 package com.ibmbootcamp.jobapplicationapi.services;
 
 import com.ibmbootcamp.jobapplicationapi.Entity.Candidato;
+import com.ibmbootcamp.jobapplicationapi.dtos.CandidatoPayloadDTO;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -9,32 +10,27 @@ import org.springframework.stereotype.Service;
 @Service
 public class CandidatoService {
   public List<Candidato> candidatos = new ArrayList<>();
-  private static List<String> aprovados = new ArrayList<>();
-  private long newId = 1;
+  private static final List<String> aprovados = new ArrayList<>();
+  private int newId = 1;
 
-  public int iniciarProcesso(String nome) throws Exception {
-    if (nome == null || nome.isEmpty()) {
-      System.out.println("passou aqui");
+  public int iniciarProcesso(CandidatoPayloadDTO candidatoDTO) throws Exception {
+    if (candidatoDTO.nome() == null || candidatoDTO.nome().isEmpty()) {
       throw new Exception("Nome inválido.");
     }
 
     for (Candidato candidato : candidatos) {
-      if (candidato.getNome().equals(nome)) {
+      if (candidato.getNome().equals(candidatoDTO.nome())) {
         throw new Exception("Candidato já participa do processo.");
       }
     }
 
     Candidato novoCandidato = new Candidato();
-    novoCandidato.setNome(nome);
+    novoCandidato.setNome(candidatoDTO.nome());
     novoCandidato.setStatus("Recebido");
-    novoCandidato.setCodCandidato((int) newId++);
-
+    novoCandidato.setCodCandidato(newId++);
 
     candidatos.add(novoCandidato);
-//    System.out.println(novoCandidato.getStatus());
-//    System.out.println("Candidato: " + novoCandidato.getNome() + "," + novoCandidato.getId());
-//    System.out.println("candidatos: " + candidatos.size());
-    return novoCandidato.getCodCandidato();
+    return candidatoDTO.codCandidato();
   }
 
   public void marcarEntrevista(int codCandidato) throws Exception {

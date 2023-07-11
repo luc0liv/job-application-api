@@ -1,10 +1,12 @@
 package com.ibmbootcamp.jobapplicationapi.controllers;
 
 import com.ibmbootcamp.jobapplicationapi.Entity.Candidato;
+import com.ibmbootcamp.jobapplicationapi.dtos.CandidatoPayloadDTO;
 import com.ibmbootcamp.jobapplicationapi.services.CandidatoService;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,16 +18,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/hiring")
 public class CandidatoController {
-  private final CandidatoService candidatoService;
-
-  public CandidatoController(CandidatoService candidatoService) {
-    this.candidatoService = candidatoService;
-  }
+  @Autowired
+  private CandidatoService candidatoService;
 
   @PostMapping(path = "start")
-  public int startProcess(@RequestBody Candidato candidato) throws Exception {
-    String nome = candidato.getNome();
-    return candidatoService.iniciarProcesso(nome);
+  public int startProcess(@RequestBody CandidatoPayloadDTO candidato) throws Exception {
+//    String nome = candidato.nome();
+    return candidatoService.iniciarProcesso(candidato);
   }
 
   @PostMapping(path = "schedule")

@@ -10,9 +10,4 @@ public class Candidato {
   private int codCandidato;
   private String nome;
   private String status;
-
-//  public Candidato(String nome, String status) {
-//    this.nome = nome;
-//    this.status = status;
-//  }
 }
