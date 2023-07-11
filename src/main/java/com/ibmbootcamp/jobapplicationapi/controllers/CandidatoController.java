@@ -6,7 +6,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 
@@ -23,8 +22,18 @@ public class CandidatoController {
   @PostMapping(path = "start")
   public int startProcess(@RequestBody Candidato candidato) throws Exception {
     String nome = candidato.getNome();
-
-    System.out.println("startProcess: " + nome);
     return candidatoService.iniciarProcesso(nome);
+  }
+
+  @PostMapping(path = "schedule")
+  public void scheduleInterview(@RequestBody Candidato candidato) throws Exception {
+    int codCandidato = candidato.getCodCandidato();
+    candidatoService.marcarEntrevista(codCandidato);
+  }
+
+  @PostMapping(path = "disqualify")
+  public void disqualifyCandidate(@RequestBody Candidato candidato) throws Exception {
+    int codCandidato = candidato.getCodCandidato();
+    candidatoService.desqualificarCandidato(codCandidato);
   }
 }

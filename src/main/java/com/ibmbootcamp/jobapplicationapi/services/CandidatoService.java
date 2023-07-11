@@ -3,6 +3,7 @@ package com.ibmbootcamp.jobapplicationapi.services;
 import com.ibmbootcamp.jobapplicationapi.Entity.Candidato;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -25,13 +26,45 @@ public class CandidatoService {
     Candidato novoCandidato = new Candidato();
     novoCandidato.setNome(nome);
     novoCandidato.setStatus("Recebido");
-    novoCandidato.setId((int) newId++);
+    novoCandidato.setCodCandidato((int) newId++);
 
 
     candidatos.add(novoCandidato);
 //    System.out.println(novoCandidato.getStatus());
 //    System.out.println("Candidato: " + novoCandidato.getNome() + "," + novoCandidato.getId());
 //    System.out.println("candidatos: " + candidatos.size());
-    return novoCandidato.getId();
+    return novoCandidato.getCodCandidato();
+  }
+
+  public void marcarEntrevista(int codCandidato) throws Exception {
+    boolean encontrado = false;
+    Candidato cand = new Candidato();
+
+    for (Candidato candidato : candidatos) {
+      if (candidato.getCodCandidato() == codCandidato) {
+        candidato.setStatus("Qualificado");
+        encontrado = true;
+        break;
+      }
+    }
+
+    if (!encontrado) {
+      throw new Exception("Candidato não encontrado");
+    }
+  }
+
+  public void desqualificarCandidato(int codCandidato) throws Exception {
+    boolean encontrado = false;
+    for (int i = 0; i < candidatos.size(); i++) {
+      if (Objects.equals(candidatos.get(i).getCodCandidato(), codCandidato)) {
+        candidatos.remove(i);
+        encontrado = true;
+        break;
+      }
+    }
+
+    if (!encontrado) {
+      throw new Exception("Candidato não foi encontrado");
+    }
   }
 }

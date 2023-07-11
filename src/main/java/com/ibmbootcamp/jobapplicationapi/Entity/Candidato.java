@@ -7,7 +7,7 @@ import lombok.Setter;
 @Setter
 
 public class Candidato {
-  private int id;
+  private int codCandidato;
   private String nome;
   private String status;
 
