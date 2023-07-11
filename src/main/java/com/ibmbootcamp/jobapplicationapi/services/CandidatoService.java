@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class CandidatoService {
   public List<Candidato> candidatos = new ArrayList<>();
-  private static List<String> aprovados = new ArrayList<>();
   private int newId = 1;
 
   public CandidatoResponseDTO iniciarProcesso(CandidatoPayloadDTO candidatoDTO) {
@@ -107,8 +106,7 @@ public class CandidatoService {
         nomesAprovados.add(candidato.getNome());
       }
     }
-
-    aprovados = (List<String>) nomesAprovados;
+    List<String> aprovados = new ArrayList<>(nomesAprovados);
     return aprovados;
   }
 }
