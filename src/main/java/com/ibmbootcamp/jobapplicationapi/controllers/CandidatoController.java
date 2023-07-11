@@ -2,14 +2,17 @@ package com.ibmbootcamp.jobapplicationapi.controllers;
 
 import com.ibmbootcamp.jobapplicationapi.Entity.Candidato;
 import com.ibmbootcamp.jobapplicationapi.services.CandidatoService;
-import org.springframework.stereotype.Controller;
+
+import java.util.List;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 
-@Controller
 @RestController
 @RequestMapping("/api/v1/hiring")
 public class CandidatoController {
@@ -35,5 +38,21 @@ public class CandidatoController {
   public void disqualifyCandidate(@RequestBody Candidato candidato) throws Exception {
     int codCandidato = candidato.getCodCandidato();
     candidatoService.desqualificarCandidato(codCandidato);
+  }
+
+  @PostMapping(path = "approve")
+  public void approveCandidate(@RequestBody Candidato candidato) throws Exception {
+    int codCandidato = candidato.getCodCandidato();
+    candidatoService.aprovarCandidato(codCandidato);
+  }
+
+  @GetMapping(path = "status/candidate/{codCandidato}")
+  public String getCandidateStatus(@PathVariable int codCandidato) throws Exception {
+    return candidatoService.verificarStatusCandidato(codCandidato);
+  }
+
+  @GetMapping(path = "approved")
+  public List<String> getApprovedCandidates() throws Exception {
+    return candidatoService.obterAprovados();
   }
 }

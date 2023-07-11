@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class CandidatoService {
   public List<Candidato> candidatos = new ArrayList<>();
+  private static List<String> aprovados = new ArrayList<>();
   private long newId = 1;
 
   public int iniciarProcesso(String nome) throws Exception {
@@ -38,7 +39,6 @@ public class CandidatoService {
 
   public void marcarEntrevista(int codCandidato) throws Exception {
     boolean encontrado = false;
-    Candidato cand = new Candidato();
 
     for (Candidato candidato : candidatos) {
       if (candidato.getCodCandidato() == codCandidato) {
@@ -66,5 +66,47 @@ public class CandidatoService {
     if (!encontrado) {
       throw new Exception("Candidato não foi encontrado");
     }
+  }
+
+  public void aprovarCandidato(int codCandidato) throws Exception {
+    boolean encontrado = false;
+    for (Candidato candidato : candidatos) {
+      if (Objects.equals(candidato.getCodCandidato(), codCandidato)) {
+        if (Objects.equals(candidato.getStatus(), "Qualificado")) {
+          candidato.setStatus("Aprovado");
+          encontrado = true;
+          break;
+        }
+      }
+    }
+
+    if (!encontrado) {
+      throw new Exception("Candidato não encontrado");
+    }
+  }
+
+  public String verificarStatusCandidato(int codCandidato) throws Exception {
+    boolean encontrado = false;
+    String statusDoCandidato = "";
+    for (Candidato candidato : candidatos) {
+      if (Objects.equals(candidato.getCodCandidato(), codCandidato)) {
+        statusDoCandidato = candidato.getStatus();
+        encontrado = true;
+      }
+    }
+    if (!encontrado) {
+      throw new Exception("Candidato não encontrado");
+    }
+    return statusDoCandidato;
+  }
+
+  public List<String> obterAprovados() {
+    for (Candidato candidato : candidatos) {
+      if (Objects.equals(candidato.getStatus(), "Aprovado")) {
+        aprovados.add(candidato.getNome());
+      }
+    }
+
+    return aprovados;
   }
 }
