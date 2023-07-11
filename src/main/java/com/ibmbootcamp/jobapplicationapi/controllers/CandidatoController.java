@@ -1,57 +1,85 @@
 package com.ibmbootcamp.jobapplicationapi.controllers;
 
 import com.ibmbootcamp.jobapplicationapi.Entity.Candidato;
+import com.ibmbootcamp.jobapplicationapi.dtos.CandidatoPayloadDTO;
+import com.ibmbootcamp.jobapplicationapi.dtos.CandidatoResponseDTO;
 import com.ibmbootcamp.jobapplicationapi.services.CandidatoService;
 
+import java.util.HashMap;
 import java.util.List;
 
+import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
 @RequestMapping("/api/v1/hiring")
+@CrossOrigin(origins = "http://localhost:4200/")
 public class CandidatoController {
-  private final CandidatoService candidatoService;
-
-  public CandidatoController(CandidatoService candidatoService) {
-    this.candidatoService = candidatoService;
-  }
+  @Autowired
+  private CandidatoService candidatoService;
 
   @PostMapping(path = "start")
-  public int startProcess(@RequestBody Candidato candidato) throws Exception {
-    String nome = candidato.getNome();
-    return candidatoService.iniciarProcesso(nome);
+  @ResponseStatus(code = HttpStatus.CREATED)
+  public CandidatoResponseDTO startProcess(@RequestBody CandidatoPayloadDTO candidato) {
+    return candidatoService.iniciarProcesso(candidato);
   }
 
   @PostMapping(path = "schedule")
-  public void scheduleInterview(@RequestBody Candidato candidato) throws Exception {
-    int codCandidato = candidato.getCodCandidato();
-    candidatoService.marcarEntrevista(codCandidato);
+  @ResponseStatus(code = HttpStatus.CREATED)
+  public Map<String, String> scheduleInterview(@RequestBody CandidatoPayloadDTO candidato) {
+    candidatoService.marcarEntrevista(candidato);
+    return new HashMap<>(){
+      {
+        put("message", "Entrevista marcada");
+      }
+    };
   }
 
   @PostMapping(path = "disqualify")
-  public void disqualifyCandidate(@RequestBody Candidato candidato) throws Exception {
-    int codCandidato = candidato.getCodCandidato();
-    candidatoService.desqualificarCandidato(codCandidato);
+  @ResponseStatus(code = HttpStatus.CREATED)
+  public Map<String, String> disqualifyCandidate(@RequestBody CandidatoPayloadDTO candidato) {
+    candidatoService.desqualificarCandidato(candidato);
+    return new HashMap<>(){
+      {
+        put("message", "Candidato desqualificado");
+      }
+    };
   }
 
   @PostMapping(path = "approve")
-  public void approveCandidate(@RequestBody Candidato candidato) throws Exception {
-    int codCandidato = candidato.getCodCandidato();
-    candidatoService.aprovarCandidato(codCandidato);
+  @ResponseStatus(code = HttpStatus.CREATED)
+  public Map<String, String> approveCandidate(@RequestBody CandidatoPayloadDTO candidato) {
+    candidatoService.aprovarCandidato(candidato);
+    return new HashMap<>(){
+      {
+        put("message", "Candidato aprovado");
+      }
+    };
   }
 
   @GetMapping(path = "status/candidate/{codCandidato}")
-  public String getCandidateStatus(@PathVariable int codCandidato) throws Exception {
-    return candidatoService.verificarStatusCandidato(codCandidato);
+  @ResponseStatus(code = HttpStatus.OK)
+  public Map<String, String> getCandidateStatus(@PathVariable int codCandidato) {
+    String status = candidatoService.verificarStatusCandidato(codCandidato);
+    return new HashMap<>(){
+      {
+        put("status", status);
+      }
+    };
   }
 
   @GetMapping(path = "approved")
+  @ResponseStatus(code = HttpStatus.OK)
   public List<String> getApprovedCandidates() throws Exception {
     return candidatoService.obterAprovados();
   }
