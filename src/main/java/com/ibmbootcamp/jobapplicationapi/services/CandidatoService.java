@@ -2,6 +2,7 @@ package com.ibmbootcamp.jobapplicationapi.services;
 
 import com.ibmbootcamp.jobapplicationapi.Entity.Candidato;
 import com.ibmbootcamp.jobapplicationapi.dtos.CandidatoPayloadDTO;
+import com.ibmbootcamp.jobapplicationapi.dtos.CandidatoResponseDTO;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -13,14 +14,14 @@ public class CandidatoService {
   private static final List<String> aprovados = new ArrayList<>();
   private int newId = 1;
 
-  public int iniciarProcesso(CandidatoPayloadDTO candidatoDTO) throws Exception {
+  public CandidatoResponseDTO iniciarProcesso(CandidatoPayloadDTO candidatoDTO) {
     if (candidatoDTO.nome() == null || candidatoDTO.nome().isEmpty()) {
-      throw new Exception("Nome inválido.");
+      throw new RuntimeException("Nome inválido.");
     }
 
     for (Candidato candidato : candidatos) {
       if (candidato.getNome().equals(candidatoDTO.nome())) {
-        throw new Exception("Candidato já participa do processo.");
+        throw new RuntimeException("Candidato já participa do processo.");
       }
     }
 
@@ -30,29 +31,30 @@ public class CandidatoService {
     novoCandidato.setCodCandidato(newId++);
 
     candidatos.add(novoCandidato);
-    return candidatoDTO.codCandidato();
+    return CandidatoResponseDTO.fromEntity(novoCandidato);
   }
 
-  public void marcarEntrevista(int codCandidato) throws Exception {
+  public void marcarEntrevista(CandidatoPayloadDTO candidato) {
     boolean encontrado = false;
 
-    for (Candidato candidato : candidatos) {
-      if (candidato.getCodCandidato() == codCandidato) {
-        candidato.setStatus("Qualificado");
+    for (Candidato cand : candidatos) {
+      if (cand.getCodCandidato() == candidato.codCandidato() && cand.getStatus().equals("Recebido")) {
+        cand.setStatus("Qualificado");
         encontrado = true;
         break;
       }
     }
 
     if (!encontrado) {
-      throw new Exception("Candidato não encontrado");
+      throw new RuntimeException("Candidato não encontrado");
     }
   }
 
-  public void desqualificarCandidato(int codCandidato) throws Exception {
+  public void desqualificarCandidato(CandidatoPayloadDTO candidato) {
     boolean encontrado = false;
     for (int i = 0; i < candidatos.size(); i++) {
-      if (Objects.equals(candidatos.get(i).getCodCandidato(), codCandidato)) {
+      if (Objects.equals(candidatos.get(i).getCodCandidato(), candidato.codCandidato())
+      && candidatos.get(i).getStatus().equals("Qualificado")) {
         candidatos.remove(i);
         encontrado = true;
         break;
@@ -60,38 +62,37 @@ public class CandidatoService {
     }
 
     if (!encontrado) {
-      throw new Exception("Candidato não foi encontrado");
+      throw new RuntimeException("Candidato não encontrado");
     }
   }
 
-  public void aprovarCandidato(int codCandidato) throws Exception {
+  public void aprovarCandidato(CandidatoPayloadDTO candidato) {
     boolean encontrado = false;
-    for (Candidato candidato : candidatos) {
-      if (Objects.equals(candidato.getCodCandidato(), codCandidato)) {
-        if (Objects.equals(candidato.getStatus(), "Qualificado")) {
-          candidato.setStatus("Aprovado");
+    for (Candidato cand : candidatos) {
+      if (Objects.equals(cand.getCodCandidato(), candidato.codCandidato()) && cand.getStatus().equals("Qualificado")) {
+          cand.setStatus("Aprovado");
           encontrado = true;
           break;
         }
-      }
+//      }
     }
 
     if (!encontrado) {
-      throw new Exception("Candidato não encontrado");
+      throw new RuntimeException("Candidato não encontrado");
     }
   }
 
-  public String verificarStatusCandidato(int codCandidato) throws Exception {
+  public String verificarStatusCandidato(int codCandidato) {
     boolean encontrado = false;
     String statusDoCandidato = "";
-    for (Candidato candidato : candidatos) {
-      if (Objects.equals(candidato.getCodCandidato(), codCandidato)) {
-        statusDoCandidato = candidato.getStatus();
+    for (Candidato cand : candidatos) {
+      if (Objects.equals(cand.getCodCandidato(), codCandidato)) {
+        statusDoCandidato = cand.getStatus();
         encontrado = true;
       }
     }
     if (!encontrado) {
-      throw new Exception("Candidato não encontrado");
+      throw new RuntimeException("Candidato não encontrado");
     }
     return statusDoCandidato;
   }
